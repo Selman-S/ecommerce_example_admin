@@ -1,4 +1,4 @@
-import CollectionForm from "@/components/layout/collections/CollectionForm"
+import CollectionForm from "@/components/collections/CollectionForm"
 
 
 const CreateCollection = () => {
