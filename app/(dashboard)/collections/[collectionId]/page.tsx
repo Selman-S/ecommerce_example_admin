@@ -1,6 +1,9 @@
+"use client"
+
+import { useEffect, useState } from "react"
+
 import CollectionForm from "@/components/collections/CollectionForm";
 import Loader from "@/components/custom ui/Loader";
-import { useEffect, useState } from "react"
 
 const CollectionDetail = ({params}:{params: {collectionId:string}}) => {
   const [loading,setLoading] = useState(true)
@@ -12,13 +15,13 @@ const getCollectionDetails = async () => {
       method: "GET"
     });
     const data = await res.json();
+    console.log("data", data);
+    setCollectionDetails(data);
+    setLoading(false);
+    
 
-    if (res.ok) {
-      setCollectionDetails(data);
-      setLoading(false);
-    }
   } catch (error) {
-    console.log("collection_detail", error);
+    console.log("collection_detailerror", error);
   }
 
 }
