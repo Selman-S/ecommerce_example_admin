@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
 import ImageUploader from "../custom ui/ImageUploader";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   title: z.string().min(2).max(40),
@@ -25,6 +26,7 @@ const formSchema = z.object({
 });
 
 const CollectionForm = () => {
+  const router = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -32,6 +34,12 @@ const CollectionForm = () => {
       description: "",
       image: "",
     },
+  });
+
+  //  onchange
+
+  form.watch((value) => {
+    console.log(value);
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -56,7 +64,7 @@ const CollectionForm = () => {
               </FormItem>
             )}
           />
-             <FormField
+          <FormField
             control={form.control}
             name="description"
             render={({ field }) => (
@@ -69,17 +77,28 @@ const CollectionForm = () => {
               </FormItem>
             )}
           />
-           <FormField
+          <FormField
             control={form.control}
             name="image"
             render={({ field }) => (
               <FormItem>
-                <ImageUploader />
+                <FormLabel>Image</FormLabel>
+                <FormControl>
+                  <ImageUploader
+                    value={field.value ? [field.value] : []}
+                    onChange={(url) => field.onChange(url)}
+                    onRemove={() => field.onChange("")}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <div  className="flex gap-10">
+
+          <Button type="submit" className="bg-blue-1 text-white">Submit</Button>
+          <Button type="button" onClick={()=>router.push('/collections')} className="bg-blue-1 text-white">Discard</Button>
+          </div>
         </form>
       </Form>
     </div>

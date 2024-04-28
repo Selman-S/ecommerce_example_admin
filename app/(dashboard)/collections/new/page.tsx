@@ -3,9 +3,11 @@ import CollectionForm from "@/components/collections/CollectionForm"
 
 const CreateCollection = () => {
   return (
-    <div>
+<div className="w-100">
+
       <CollectionForm />
-    </div>
+</div>
+  
   )
 }
 
