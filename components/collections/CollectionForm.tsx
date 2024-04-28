@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
 import ImageUploader from "../custom ui/ImageUploader";
-import { useRouter } from "next/navigation";
+import {  useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -27,12 +27,17 @@ const formSchema = z.object({
   image: z.string(),
 });
 
-const CollectionForm = () => {
+interface CollectionFormProps {
+  initialData?:CollectionType| null;
+}
+const CollectionForm = ({initialData}:CollectionFormProps) => {
+
   const [loading, setloading] = useState(false)
   const router = useRouter()
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    defaultValues:initialData? initialData:{
       title: "",
       description: "",
       image: "",
@@ -48,7 +53,8 @@ const CollectionForm = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setloading(true)
-      const res = await fetch("/api/collections", {
+      const url = initialData ? `/api/collections/${initialData._id}` : "/api/collections";
+      const res = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

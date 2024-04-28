@@ -5,7 +5,7 @@ const CreateCollection = () => {
   return (
 <div className="w-100">
 
-      <CollectionForm />
+      <CollectionForm  />
 </div>
   
   )
