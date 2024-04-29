@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { Separator } from "../ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,10 +18,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
 import ImageUploader from "../custom ui/ImageUploader";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import toast from "react-hot-toast";
 import Delete from "../custom ui/Delete";
 import MultiText from "../custom ui/MultiText";
+import MultiSelect from "../custom ui/MultiSelect";
 
 const formSchema = z.object({
   title: z.string().min(2).max(40),
@@ -37,16 +37,40 @@ const formSchema = z.object({
 });
 
 interface ProductFormProps {
-  initialData?: ProductType | null;
+  initialData?: ProductType | null; //Must have "?" to make it optional
 }
 const ProductForm = ({ initialData }: ProductFormProps) => {
-  const [loading, setloading] = useState(false);
   const router = useRouter();
 
+  const [loading, setloading] = useState(false);
+  const [collections, setCollections] = useState<CollectionType[]>([]);
+
+  const getCollections = async () => {
+    try {
+      const res = await fetch("/api/collections", {
+        method: "GET",
+      });
+      const data = await res.json();
+      setCollections(data);
+      setloading(false);
+    } catch (error) {
+      console.log("collections_get", error);
+      toast.error("Failed to fetch collections");
+    }
+  };
+
+  useEffect(() => {
+    getCollections();
+  }, []);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData
-      ? initialData
+      ? {
+          ...initialData,
+          collections: initialData.collections.map(
+            (collection) => collection._id
+          ),
+        }
       : {
           title: "",
           description: "",
@@ -56,15 +80,15 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
           tags: [],
           sizes: [],
           colors: [],
-          expense: 0.1,
           price: 0.1,
+          expense: 0.1,
         },
   });
 
   //  onchange
 
   form.watch((value) => {
-     console.log(value);
+    console.log(value);
   });
 
   const handleKeyPress = (
@@ -212,7 +236,6 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
                 <FormItem>
                   <FormLabel>Category</FormLabel>
                   <FormControl>
-                    
                     <Input
                       placeholder="Category"
                       {...field}
@@ -222,7 +245,7 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
                   <FormMessage />
                 </FormItem>
               )}
-            />{" "}
+            />
             <FormField
               control={form.control}
               name="tags"
@@ -230,12 +253,14 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
                 <FormItem>
                   <FormLabel>tags</FormLabel>
                   <FormControl>
-                  <MultiText
-                      placeholder="tags"
+                    <MultiText
+                      placeholder="Tags"
                       value={field.value}
                       onChange={(tag) => field.onChange([...field.value, tag])}
                       onRemove={(tagRemove) =>
-                        field.onChange(field.value.filter((tag) => tag !== tagRemove))
+                        field.onChange([
+                          ...field.value.filter((tag) => tag !== tagRemove),
+                        ])
                       }
                     />
                   </FormControl>
@@ -243,6 +268,35 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
                 </FormItem>
               )}
             />
+            {collections.length > 0 && (
+              <FormField
+                control={form.control}
+                name="collections"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Collections</FormLabel>
+                    <FormControl>
+                      <MultiSelect
+                        placeholder="Collections"
+                        collections={collections}
+                        value={field.value}
+                        onChange={(_id) =>
+                          field.onChange([...field.value, _id])
+                        }
+                        onRemove={(idToRemove) =>
+                          field.onChange([
+                            ...field.value.filter(
+                              (collectionId) => collectionId !== idToRemove
+                            ),
+                          ])
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-1" />
+                  </FormItem>
+                )}
+              />
+            )}
           </div>
           <div className="flex gap-10">
             <Button type="submit" className="bg-blue-1 text-white">
