@@ -34,7 +34,7 @@ export const POST = async (req: NextRequest)=> {
 
   await newCollection.save();
 
-  return new NextResponse(newCollection, { status: 201 });
+  return NextResponse.json(newCollection, { status: 201 });
 
   
  } catch (error) {
