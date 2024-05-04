@@ -28,44 +28,137 @@ export const GET = async (
   }
 };
 
-// export const POST = async (
-//   req: NextRequest,
-//   { params }: { params: { collectionId: string } }
-// ) => {
-//   try {
-//     const { userId } = auth();
-//     if (!userId) {
-//       return new NextResponse("Unauthorized", { status: 403 });
-//     }
-//     await connectToDB();
+export const POST = async (
+  req: NextRequest,
+  { params }: { params: { productId: string } }
+) => {
+  try {
+    const { userId } = auth();
+    if (!userId) {
+      return new NextResponse("Unauthorized", { status: 403 });
+    }
+    await connectToDB();
 
-//     let collection = await Collection.findById(params.collectionId);
+    let product = await Product.findById(params.productId);
 
-//     if (!collection) {
-//       return new NextResponse("Collection not found", { status: 404 });
-//     }
+    if (!product) {
+      return new NextResponse("Product not found", { status: 404 });
+    }
 
-//     const { title, description, image } = await req.json();
+    
+    
+    const {
+      title,
+      description,
+      media,
+      category,
+      collections,
+      tags,
+      sizes,
+      colors,
+      price,
+      expense,
+    } = await req.json();
+    
+    if (!title || !description || !media || !category || !price || !expense) {
+      return new NextResponse("Not enough data to create a product", {
+        status: 400,
+      });
+    }
+    
+    
+      // added collections
+    
+      const addedCollections = collections.filter((collectionId:string) => {
+        return !product.collections.includes(collectionId);
+      });
 
-//     if (!title || !image) {
-//       return new NextResponse("Title and image are required", { status: 400 });
-//     }
+      // removed collections
 
-//     collection = await Collection.findByIdAndUpdate(
-//       params.collectionId,
-//       { title, description, image },
-//       { new: true }
-//     );
+      const removedCollections = product.collections.filter((collectionId:string) => {
+        return !collections.includes(collectionId);
+      });
 
-//     await collection.save();
+      await Promise.all([
+        //update collections
+        ...addedCollections.map((collectionId:string) => 
+          Collection.findByIdAndUpdate(collectionId, {
+            $push: { products: product._id },
+          })
+        ),
+      ]);
+      
+      await Promise.all([
+        //update collections
+        ...removedCollections.map((collectionId:string) => 
+           Collection.findByIdAndUpdate(collectionId, {
+            $pull: { products: product._id },
+          })
+          ),
+      ]);
 
-//     return NextResponse.json(collection, { status: 200 });
-//   } catch (error) {
-//     console.log("collection_get", error);
-//     return new NextResponse("Internal Server Error", { status: 500 });
-//   }
-// };
+      // update product
+    const updateProduct = await Product.findByIdAndUpdate(
+      product._id,
+      {
+        title,
+        description,
+        media,
+        category,
+        collections,
+        tags,
+        sizes,
+        colors,
+        price,
+        expense,
+      },
+      { new: true }
+    ).populate({path:"collections",model:Collection});
 
+    await updateProduct.save();
+
+    return NextResponse.json(updateProduct, { status: 200 });
+  } catch (error) {
+    console.log("product_post", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+}
+
+export const DELETE = async (
+  req: NextRequest,
+  { params }: { params: { productId: string } }
+) => {
+  try {
+    const { userId } = auth();
+    if (!userId) {
+      return new NextResponse("Unauthorized", { status: 403 });
+    }
+    await connectToDB();
+
+    let product = await Product.findById(params.productId);
+
+    if (!product) {
+      return new NextResponse("Product not found", { status: 404 });
+    }
+
+    await Product.findByIdAndDelete(params.productId);
+
+
+    // update other collections
+    await Promise.all(
+      product.collections.map((collectionId:string) =>
+        Collection.findByIdAndUpdate(collectionId, {
+          $pull: { products: product._id },
+        })
+      )
+    );
+
+    return new NextResponse("Product deleted", { status: 200 });
+  } catch (error) {
+    console.log("product_delete", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+};
 // export const DELETE = async (
 //   req: NextRequest,
 //   { params }: { params: { collectionId: string } }

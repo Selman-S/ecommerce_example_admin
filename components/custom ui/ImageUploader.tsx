@@ -51,7 +51,7 @@ const ImageUploader = ({ value, onChange, onRemove }: ImageUploaderProps) => {
       <CldUploadWidget uploadPreset="ronb0alq" onUpload={onUpload}>
         {({ open }) => {
           return (
-            <Button onClick={() => open()} className="bg-gray-500 text-white">
+            <Button type="button" onClick={() => open()} className="bg-gray-500 text-white">
               <Plus className="h-4 w-4 mr-2 font-bold" /> Upload Image
             </Button>
           );

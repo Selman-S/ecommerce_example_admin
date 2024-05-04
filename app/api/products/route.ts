@@ -53,6 +53,7 @@ export const POST = async (req: NextRequest) => {
     
     await newProduct.save();
 
+    // product oluşturduğunda collectiona da eklemek gerekiyor
     if (collections) {
       for (const collectionId of collections) {
         const collection = await Collection.findById(collectionId);

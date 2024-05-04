@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 
 import { connectToDB } from "@/lib/mongoDB";
 import Collection from "@/lib/models/Collection";
+import Product from "@/lib/models/Product";
 
 export const GET = async (
   req: NextRequest,
@@ -77,6 +78,12 @@ export const DELETE = async (
     await connectToDB();
 
     await Collection.findByIdAndDelete(params.collectionId);
+
+    // collection silindiğinde productlardaki collectionları da çıkarmak için
+    await Product.updateMany(
+      { collections: params.collectionId },
+      { $pull: { collections: params.collectionId } }
+    );
 
     return new NextResponse("Collection deleted", { status: 200 });
   } catch (error) {
