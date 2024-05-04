@@ -53,7 +53,7 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
       const data = await res.json();
       setCollections(data);
       setLoading(false);
-    } catch (error) {
+       } catch (error) {
       console.log("collections_get", error);
       toast.error("Failed to fetch collections");
     }
@@ -102,6 +102,8 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log(values);
+    
     try {
       setLoading(true);
       const url = initialData
@@ -129,7 +131,7 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
       {initialData ? (
         <div className="flex items-center justify-between">
           <p className="text-heading2-bold">Edit Product</p>
-          <Delete id={initialData._id} />
+          <Delete item="products" id={initialData._id} />
         </div>
       ) : (
         <p className="text-heading2-bold">Create Product</p>
@@ -346,7 +348,7 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
             </Button>
             <Button
               type="button"
-              onClick={() => router.push("/collections")}
+              onClick={() => router.push("/products")}
               className="bg-blue-1 text-white"
             >
               Discard

@@ -91,7 +91,7 @@ const CollectionForm = ({ initialData }: CollectionFormProps) => {
       {initialData ? (
         <div className="flex items-center justify-between">
           <p className="text-heading2-bold">Edit Collection</p>
-          <Delete id={initialData._id} />
+          <Delete item="collections" id={initialData._id} />
         </div>
       ) : (
         <p className="text-heading2-bold">Create Collection</p>

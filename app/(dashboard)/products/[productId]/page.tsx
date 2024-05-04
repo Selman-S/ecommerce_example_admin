@@ -2,40 +2,40 @@
 
 import { useEffect, useState } from "react"
 
-import CollectionForm from "@/components/collections/CollectionForm";
 import Loader from "@/components/custom ui/Loader";
+import ProductForm from "@/components/products/productForm";
 
-const CollectionDetail = ({params}:{params: {collectionId:string}}) => {
+const ProductDetail = ({params}:{params: {productId:string}}) => {
   const [loading,setLoading] = useState(true)
-  const [collectionDetails,setCollectionDetails] = useState<CollectionType | null>(null);
+  const [productDetails,setProductDetails] = useState<ProductType | null>(null);
 
-const getCollectionDetails = async () => {
+const getProductDetails = async () => {
   try {
-    const res = await fetch(`/api/collections/${params.collectionId}`,{
+    const res = await fetch(`/api/products/${params.productId}`,{
       method: "GET"
     });
     const data = await res.json();
     console.log("data", data);
-    setCollectionDetails(data);
+    setProductDetails(data);
     setLoading(false);
     
 
   } catch (error) {
-    console.log("collection_detailerror", error);
+    console.log("product_detailerror", error);
   }
 
 }
 
 useEffect(() => {
-  getCollectionDetails();
+  getProductDetails();
 }, [])
 
 
 
   return loading ? <Loader /> : (
-<CollectionForm initialData={collectionDetails} />
+<ProductForm initialData={productDetails} />
     )
   
 }
 
-export default CollectionDetail
+export default ProductDetail
