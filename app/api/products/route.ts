@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import Product from "@/lib/models/Product";
 import { connectToDB } from "@/lib/mongoDB";
+import Collection from "@/lib/models/Collection";
 
 export const POST = async (req: NextRequest) => {
   try {
@@ -13,26 +14,13 @@ export const POST = async (req: NextRequest) => {
     }
 
     await connectToDB();
-    // title: "",
-    // description: "",
-    // media: [],
-    // category: "",
-    // collections: [],
-    // tags: [],
-    // sizes: [],
-    // colors: 0.1,
-    // expense: 0.1,
 
     const { title, description, media, category, collections,
       tags, sizes, colors, expense,price } = await req.json();
 
 
-  
-
-   
-
     if (!title || !description|| !media|| !category|| !price|| !expense) {
-      return new NextResponse("Title and image are required", { status: 400 });
+      return new NextResponse(" Not enough data to create", { status: 400 });
     }
 
     const newProduct = await Product.create({
@@ -57,15 +45,15 @@ export const POST = async (req: NextRequest) => {
   }
 };
 
-// export const GET = async (req: NextRequest) => {
-//   try {
-//     await connectToDB();
+export const GET = async (req: NextRequest) => {
+  try {
+    await connectToDB();
 
-//     const collections = await Collection.find().sort({ createdAt: "desc" });
+    const products = await Product.find({}).sort({ createdAt: "desc" }).populate({path: 'collections',model: Collection});
 
-//     return NextResponse.json(collections, { status: 200 });
-//   } catch (error) {
-//     console.log("collection_get", error);
-//     return new NextResponse("Internal Server Error", { status: 500 });
-//   }
-// };
+    return NextResponse.json(products, { status: 200 });
+  } catch (error) {
+    console.log("products get", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
+};

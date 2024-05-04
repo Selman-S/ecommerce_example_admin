@@ -24,7 +24,7 @@ import MultiText from "../custom ui/MultiText";
 import MultiSelect from "../custom ui/MultiSelect";
 
 const formSchema = z.object({
-  title: z.string().min(2).max(40),
+  title: z.string().min(2).max(100),
   description: z.string().min(2).max(500).trim(),
   media: z.array(z.string()),
   category: z.string(),
@@ -42,7 +42,7 @@ interface ProductFormProps {
 const ProductForm = ({ initialData }: ProductFormProps) => {
   const router = useRouter();
 
-  const [loading, setloading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [collections, setCollections] = useState<CollectionType[]>([]);
 
   const getCollections = async () => {
@@ -52,7 +52,7 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
       });
       const data = await res.json();
       setCollections(data);
-      setloading(false);
+      setLoading(false);
     } catch (error) {
       console.log("collections_get", error);
       toast.error("Failed to fetch collections");
@@ -88,7 +88,7 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
   //  onchange
 
   form.watch((value) => {
-    console.log(value);
+    // console.log(value);
   });
 
   const handleKeyPress = (
@@ -103,7 +103,7 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      setloading(true);
+      setLoading(true);
       const url = initialData
         ? `/api/products/${initialData._id}`
         : "/api/products";
@@ -111,19 +111,18 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
         method: "POST",
         body: JSON.stringify(values),
       });
-
+      console.log(res);
+      
       if (res.ok) {
-        setloading(false);
-        toast.success(`Products ${initialData ? "updated" : "created"}`);
+        setLoading(false);
+        toast.success(`Product ${initialData ? "updated" : "created"}`);
+        window.location.href = "/products";
         router.push("/products");
       }
-    } catch (error) {
-      setloading(false);
-      toast.error("Failed to create products");
-      console.log("products_post", error);
+    } catch (err) {
+      console.log("[products_POST]", err);
+      toast.error("Something went wrong! Please try again.");
     }
-
-    console.log(values);
   };
   return (
     <div className="p-10">
@@ -151,7 +150,7 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
                     onKeyDown={handleKeyPress}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-1" />
               </FormItem>
             )}
           />
@@ -169,7 +168,7 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
                     onKeyDown={handleKeyPress}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-1"  />
               </FormItem>
             )}
           />
@@ -188,11 +187,11 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
                     }
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-1"  />
               </FormItem>
             )}
           />
-          <div className="md:grid md:grid-cols-3 gap-8">
+          <div className="md:grid md:grid-cols-3 gap-8 mt-4">
             <FormField
               control={form.control}
               name="price"
@@ -207,7 +206,7 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
                       onKeyDown={handleKeyPress}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-1"  />
                 </FormItem>
               )}
             />
@@ -225,7 +224,7 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
                       onKeyDown={handleKeyPress}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-1"  />
                 </FormItem>
               )}
             />
@@ -242,7 +241,7 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
                       onKeyDown={handleKeyPress}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-1"  />
                 </FormItem>
               )}
             />
@@ -264,7 +263,7 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
                       }
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage  className="text-red-1" />
                 </FormItem>
               )}
             />
@@ -307,18 +306,39 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
                     <MultiText
                       placeholder="colors"
                       value={field.value}
-                      onChange={(tag) => field.onChange([...field.value, tag])}
-                      onRemove={(tagRemove) =>
+                      onChange={(color) => field.onChange([...field.value, color])}
+                      onRemove={(colorRemove) =>
                         field.onChange([
-                          ...field.value.filter((tag) => tag !== tagRemove),
+                          ...field.value.filter((color) => color !== colorRemove),
                         ])
                       }
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage  className="text-red-1" />
                 </FormItem>
               )}
-            />
+            />  <FormField
+            control={form.control}
+            name="sizes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Sizes</FormLabel>
+                <FormControl>
+                  <MultiText
+                    placeholder="sizes"
+                    value={field.value}
+                    onChange={(size) => field.onChange([...field.value, size])}
+                    onRemove={(sizeRemove) =>
+                      field.onChange([
+                        ...field.value.filter((size) => size !== sizeRemove),
+                      ])
+                    }
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           </div>
           <div className="flex gap-10">
             <Button type="submit" className="bg-blue-1 text-white">
