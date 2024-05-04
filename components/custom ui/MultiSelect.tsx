@@ -43,19 +43,19 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
     ) as CollectionType[];
   }
 
-  const selectables = collections.filter(
-    (collection) => !selected.includes(collection)
-  );
- console.log(open);
- 
+  const selectables = collections.filter((collection) => !selected.includes(collection)); 
 
   return (
     <Command className="overflow-visible bg-white">
-   <div className="flex gap-1 flex-wrap border rounded-md">
+      <div className="flex gap-1 flex-wrap border rounded-md">
         {selected.map((collection) => (
           <Badge key={collection._id}>
             {collection.title}
-            <button type="button" className="ml-1 hover:text-red-1" onClick={() => onRemove(collection._id)}>
+            <button
+              type="button"
+              className="ml-1 hover:text-red-1"
+              onClick={() => onRemove(collection._id)}
+            >
               <X className="h-3 w-3" />
             </button>
           </Badge>
@@ -69,18 +69,36 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
           onFocus={() => setOpen(true)}
         />
       </div>
-          {open && (
-            
-            <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
-        <CommandGroup >
-          <CommandItem>Calendar</CommandItem>
-          <CommandItem>Search Emoji</CommandItem>
-          <CommandItem>Calculator</CommandItem>
-        </CommandGroup>
-            
-      </CommandList>
-      )}
+      <div className="relative mt-2 multi-selected-area">
+        {open && (
+          <CommandList  className="absolute w-full z-30 top-0 overflow-auto border rounded-md shadow-md">
+            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandGroup>
+              {selectables.map((collection) => (
+                <CommandItem
+                aria-multiselectable={true}
+                onClick={(e)=>{console.log(e.target)}}
+                disabled={false}
+                  key={collection._id}
+                  onMouseDown={(e) => {
+                     e.preventDefault()
+                  }}
+                  onSelect={() => {
+                    onChange(collection._id);
+                    setInputValue("");
+                  }}
+                  className="hover:bg-grey-2 cursor-pointer collection-items"
+                >
+                  <div className="dropitem">
+
+                  {collection.title}
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        )}
+      </div>
     </Command>
   );
 };

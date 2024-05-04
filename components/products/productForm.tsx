@@ -297,6 +297,28 @@ const ProductForm = ({ initialData }: ProductFormProps) => {
                 )}
               />
             )}
+            <FormField
+              control={form.control}
+              name="colors"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Colors</FormLabel>
+                  <FormControl>
+                    <MultiText
+                      placeholder="colors"
+                      value={field.value}
+                      onChange={(tag) => field.onChange([...field.value, tag])}
+                      onRemove={(tagRemove) =>
+                        field.onChange([
+                          ...field.value.filter((tag) => tag !== tagRemove),
+                        ])
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
           <div className="flex gap-10">
             <Button type="submit" className="bg-blue-1 text-white">
