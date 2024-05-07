@@ -7,7 +7,6 @@ import { stripe } from "@/lib/stripe";
 export const POST = async (req: NextRequest) => {
   try {
     const rawBody = await req.text()
-    console.log("[webhooks_POST]", rawBody);
     
     const signature = req.headers.get("Stripe-Signature") as string
 
