@@ -7,8 +7,9 @@ import {
   useReactTable,
   ColumnFiltersState,
   getFilteredRowModel,
+  getPaginationRowModel,
 } from "@tanstack/react-table";
-
+import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "../ui/input";
 import { useState } from "react";
+
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -34,16 +36,18 @@ export function DataTable<TData, TValue>({
  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
   []
 )
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    state: {
-     columnFilters,
-    }
-  });
+const table = useReactTable({
+  data,
+  columns,
+  getCoreRowModel: getCoreRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
+  onColumnFiltersChange: setColumnFilters,
+  getFilteredRowModel: getFilteredRowModel(),
+  state: {
+   columnFilters,
+  }
+})
+
 
   return (
     <div className="py-5">
@@ -57,6 +61,7 @@ export function DataTable<TData, TValue>({
           className="max-w-sm"
         />
       </div>
+      <div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -107,6 +112,25 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
+      </div>
+    </div>
     </div>
   );
 }
