@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 
 import { connectToDB } from "@/lib/mongoDB";
 import Collection from "@/lib/models/Collection";
 import Product from "@/lib/models/Product";
+import { auth } from "@clerk/nextjs/server";
 
 export const GET = async (
   req: NextRequest,
@@ -12,7 +12,9 @@ export const GET = async (
   try {
     await connectToDB();
 
-    const collection = await Collection.findById(params.collectionId);
+    const collection = await Collection.findById(params.collectionId).populate({ path: "products", model: Product });
+    console.log(collection);
+    
 
     if (!collection) {
       return new NextResponse(
@@ -22,9 +24,9 @@ export const GET = async (
     }
 
     return NextResponse.json(collection, { status: 200 });
-  } catch (error) {
-    console.log("collection_get", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+  } catch (err) {
+    console.log("[collectionId_GET]", err);
+    return new NextResponse("Internal error", { status: 500 });
   }
 };
 
@@ -34,9 +36,11 @@ export const POST = async (
 ) => {
   try {
     const { userId } = auth();
+
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 403 });
+      return new NextResponse("Unauthorized", { status: 401 });
     }
+
     await connectToDB();
 
     let collection = await Collection.findById(params.collectionId);
@@ -60,9 +64,9 @@ export const POST = async (
     await collection.save();
 
     return NextResponse.json(collection, { status: 200 });
-  } catch (error) {
-    console.log("collection_get", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+  } catch (err) {
+    console.log("[collectionId_POST]", err);
+    return new NextResponse("Internal error", { status: 500 });
   }
 };
 
@@ -72,22 +76,25 @@ export const DELETE = async (
 ) => {
   try {
     const { userId } = auth();
+
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 403 });
+      return new NextResponse("Unauthorized", { status: 401 });
     }
+
     await connectToDB();
 
     await Collection.findByIdAndDelete(params.collectionId);
 
-    // collection silindiğinde productlardaki collectionları da çıkarmak için
     await Product.updateMany(
       { collections: params.collectionId },
       { $pull: { collections: params.collectionId } }
     );
-
-    return new NextResponse("Collection deleted", { status: 200 });
-  } catch (error) {
-    console.log("collection_delete", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    
+    return new NextResponse("Collection is deleted", { status: 200 });
+  } catch (err) {
+    console.log("[collectionId_DELETE]", err);
+    return new NextResponse("Internal error", { status: 500 });
   }
 };
+
+export const dynamic = "force-dynamic";
