@@ -1,17 +1,18 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 
 import Loader from "@/components/custom ui/Loader";
 import ProductForm from "@/components/products/productForm";
 
-const ProductDetail = ({params}:{params: {productId:string}}) => {
+const ProductDetail = ({params}:{params: Promise<{productId:string}>}) => {
+  const { productId } = use(params)
   const [loading,setLoading] = useState(true)
   const [productDetails,setProductDetails] = useState<ProductType | null>(null);
 
 const getProductDetails = async () => {
   try {
-    const res = await fetch(`/api/products/${params.productId}`,{
+    const res = await fetch(`/api/products/${productId}`,{
       method: "GET"
     });
     const data = await res.json();
@@ -27,8 +28,8 @@ const getProductDetails = async () => {
 }
 
 useEffect(() => {
-  getProductDetails();
-}, [])
+    getProductDetails();
+}, [productId])
 
 
 

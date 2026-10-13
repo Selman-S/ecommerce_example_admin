@@ -15,7 +15,7 @@ export const GET = async (req: NextRequest) => {
       const customer = await Customer.findOne({ clerkId: order.customerClerkId })
       return {
         _id: order._id,
-        customer: customer.name,
+        customer: customer?.name || "Unknown",
         products: order.products.length,
         totalAmount: order.totalAmount,
         createdAt: format(order.createdAt, "MMM do, yyyy")

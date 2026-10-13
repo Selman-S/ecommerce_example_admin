@@ -12,7 +12,7 @@ export default function LeftSideBar() {
  
   return (
     <div className="h-screen flex left-0 top-0 sticky p-10 flex-col bg-blue-2 shadow-xl max-lg:hidden gap-16 ">
-      <Image src="/logo.png" width={150} height={30} alt="logo icon" />
+      <Image src="/logo.png" width={150} height={30} alt="logo icon" priority />
       <div className="flex flex-col gap-12">
         {navLinks.map((link) => (
           <Link href={link.url} key={link.label} className={`flex gap-4 font-medium text-md ${pathname===link.url ? "text-blue-1":"text-grey-1"}`}>

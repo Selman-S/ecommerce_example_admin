@@ -1,17 +1,18 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 
 import CollectionForm from "@/components/collections/CollectionForm";
 import Loader from "@/components/custom ui/Loader";
 
-const CollectionDetail = ({params}:{params: {collectionId:string}}) => {
+const CollectionDetail = ({params}:{params: Promise<{collectionId:string}>}) => {
+  const { collectionId } = use(params)
   const [loading,setLoading] = useState(true)
   const [collectionDetails,setCollectionDetails] = useState<CollectionType | null>(null);
 
 const getCollectionDetails = async () => {
   try {
-    const res = await fetch(`/api/collections/${params.collectionId}`,{
+    const res = await fetch(`/api/collections/${collectionId}`,{
       method: "GET"
     });
     const data = await res.json();
@@ -27,8 +28,8 @@ const getCollectionDetails = async () => {
 }
 
 useEffect(() => {
-  getCollectionDetails();
-}, [])
+    getCollectionDetails();
+}, [collectionId])
 
 
 

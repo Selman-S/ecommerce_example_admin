@@ -6,7 +6,7 @@ export const getTotalSales = async () => {
   await connectToDB();
   const orders = await Order.find()
   const totalOrders = orders.length;
-  const totalRevenue = orders.reduce((acc, order) => acc + order.totalAmount, 0)
+  const totalRevenue = Number(orders.reduce((acc, order) => acc + order.totalAmount, 0).toFixed(2))
   return { totalOrders, totalRevenue }
 }
 

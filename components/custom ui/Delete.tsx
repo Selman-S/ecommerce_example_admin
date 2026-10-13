@@ -42,7 +42,8 @@ const Delete = ({id,item}:DeleteProps) => {
   return (
     
     <AlertDialog>
-    <AlertDialogTrigger>
+    {/* Trigger is already a button; asChild avoids a nested <button>. */}
+    <AlertDialogTrigger asChild>
     <Button className="bg-red-1 text-white">
       <Trash className="w-4 h-4"/>
     </Button>

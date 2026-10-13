@@ -8,6 +8,9 @@ import { ToasterProvider } from "@/lib/ToasterProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
+// Dashboard reads MongoDB and Cloudinary at request time, so skip static prerender.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Admin Ecommerce Auth",
   description: "Admin Ecommerce Dashboard",

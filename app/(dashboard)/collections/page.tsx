@@ -41,7 +41,9 @@ useEffect(() => {
 
 console.log(collections);
 
-  return (
+  return loading ? (
+    <div className="px-10 py-5">Loading collections...</div>
+  ) : (
 <div className="px-10 py-5">
 <div className="flex justify-between items-center">
  <p className="text-heading2-bold">Collections</p>

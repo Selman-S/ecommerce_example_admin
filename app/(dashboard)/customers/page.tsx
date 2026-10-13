@@ -7,13 +7,15 @@ import { connectToDB } from '@/lib/mongoDB'
 const Customers = async () => {
   await connectToDB()
 
-  const customers = await Customer.find().sort({ createdAt: "desc" })
+  const customers = await Customer.find().sort({ createdAt: "desc" }).lean()
+  // Mongoose documents are not serializable into the client table.
+  const rows = JSON.parse(JSON.stringify(customers))
 
   return (
     <div className='px-10 py-5'>
       <p className='text-heading2-bold'>Customers</p>
       <Separator className='bg-grey-1 my-5' />
-      <DataTable columns={columns} data={customers} searchKey='name'/>
+      <DataTable columns={columns} data={rows} searchKey='name'/>
     </div>
   )
 }

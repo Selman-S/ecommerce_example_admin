@@ -48,7 +48,8 @@ const ImageUploader = ({ value, onChange, onRemove }: ImageUploaderProps) => {
             </div>
         ))}
       </div>
-      <CldUploadWidget uploadPreset="ronb0alq" onUpload={onUpload}>
+      {process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ? (
+      <CldUploadWidget uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ronb0alq"} onUpload={onUpload}>
         {({ open }) => {
           return (
             <Button type="button" onClick={() => open()} className="bg-gray-500 text-white">
@@ -57,6 +58,9 @@ const ImageUploader = ({ value, onChange, onRemove }: ImageUploaderProps) => {
           );
         }}
       </CldUploadWidget>
+      ) : (
+        <p className="text-sm text-red-500">Set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME to upload images.</p>
+      )}
     </div>
   );
 };
