@@ -7,12 +7,15 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async (
   req: NextRequest,
-  { params }: { params: { productId: string } }
+  { params }: { params: Promise<{ productId: string }> }
 ) => {
   try {
     await connectToDB();
 
-    const product = await Product.findById(params.productId).populate({
+    // Next.js 15+ passes route params as a Promise.
+    const { productId } = await params
+
+    const product = await Product.findById(productId).populate({
       path: "collections",
       model: Collection,
     });
@@ -39,10 +42,11 @@ export const GET = async (
 
 export const POST = async (
   req: NextRequest,
-  { params }: { params: { productId: string } }
+  { params }: { params: Promise<{ productId: string }> }
 ) => {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
+    const { productId } = await params;
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -50,7 +54,7 @@ export const POST = async (
 
     await connectToDB();
 
-    const product = await Product.findById(params.productId);
+    const product = await Product.findById(productId);
 
     if (!product) {
       return new NextResponse(
@@ -134,10 +138,11 @@ export const POST = async (
 
 export const DELETE = async (
   req: NextRequest,
-  { params }: { params: { productId: string } }
+  { params }: { params: Promise<{ productId: string }> }
 ) => {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
+    const { productId } = await params;
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -145,7 +150,7 @@ export const DELETE = async (
 
     await connectToDB();
 
-    const product = await Product.findById(params.productId);
+    const product = await Product.findById(productId);
 
     if (!product) {
       return new NextResponse(

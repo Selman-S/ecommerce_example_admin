@@ -7,7 +7,7 @@ import Collection from "@/lib/models/Collection";
 
 export const POST = async (req: NextRequest) => {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });

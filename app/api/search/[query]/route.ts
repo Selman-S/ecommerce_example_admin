@@ -2,15 +2,18 @@ import Product from "@/lib/models/Product";
 import { connectToDB } from "@/lib/mongoDB";
 import { NextRequest, NextResponse } from "next/server";
 
-export const GET = async (req: NextRequest, { params }: { params: { query: string }}) => {
+export const GET = async (req: NextRequest, { params }: { params: Promise<{ query: string }>}) => {
   try {
     await connectToDB()
 
+    // Next.js 15+ passes route params as a Promise.
+    const { query } = await params
+
     const searchedProducts = await Product.find({
       $or: [
-        { title: { $regex: params.query, $options: "i" } },
-        { category: { $regex: params.query, $options: "i" } },
-        { tags: { $in: [new RegExp(params.query, "i")] } } // $in is used to match an array of values
+        { title: { $regex: query, $options: "i" } },
+        { category: { $regex: query, $options: "i" } },
+        { tags: { $in: [new RegExp(query, "i")] } } // $in is used to match an array of values
       ]
     })
 

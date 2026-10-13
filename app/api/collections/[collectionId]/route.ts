@@ -7,12 +7,15 @@ import { auth } from "@clerk/nextjs/server";
 
 export const GET = async (
   req: NextRequest,
-  { params }: { params: { collectionId: string } }
+  { params }: { params: Promise<{ collectionId: string }> }
 ) => {
   try {
     await connectToDB();
 
-    const collection = await Collection.findById(params.collectionId).populate({ path: "products", model: Product });
+    // Next.js 15+ passes route params as a Promise.
+    const { collectionId } = await params
+
+    const collection = await Collection.findById(collectionId).populate({ path: "products", model: Product });
     console.log(collection);
     
 
@@ -32,10 +35,11 @@ export const GET = async (
 
 export const POST = async (
   req: NextRequest,
-  { params }: { params: { collectionId: string } }
+  { params }: { params: Promise<{ collectionId: string }> }
 ) => {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
+    const { collectionId } = await params;
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -43,7 +47,7 @@ export const POST = async (
 
     await connectToDB();
 
-    let collection = await Collection.findById(params.collectionId);
+    let collection = await Collection.findById(collectionId);
 
     if (!collection) {
       return new NextResponse("Collection not found", { status: 404 });
@@ -56,7 +60,7 @@ export const POST = async (
     }
 
     collection = await Collection.findByIdAndUpdate(
-      params.collectionId,
+      collectionId,
       { title, description, image },
       { new: true }
     );
@@ -72,10 +76,11 @@ export const POST = async (
 
 export const DELETE = async (
   req: NextRequest,
-  { params }: { params: { collectionId: string } }
+  { params }: { params: Promise<{ collectionId: string }> }
 ) => {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
+    const { collectionId } = await params;
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -83,11 +88,11 @@ export const DELETE = async (
 
     await connectToDB();
 
-    await Collection.findByIdAndDelete(params.collectionId);
+    await Collection.findByIdAndDelete(collectionId);
 
     await Product.updateMany(
-      { collections: params.collectionId },
-      { $pull: { collections: params.collectionId } }
+      { collections: collectionId },
+      { $pull: { collections: collectionId } }
     );
     
     return new NextResponse("Collection is deleted", { status: 200 });

@@ -5,13 +5,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async (
   req: NextRequest,
-  { params }: { params: { customerId: string } }
+  { params }: { params: Promise<{ customerId: string }> }
 ) => {
   try {
     await connectToDB();
 
+    // Next.js 15+ passes route params as a Promise.
+    const { customerId } = await params
+
     const orders = await Order.find({
-      customerClerkId: params.customerId,
+      customerClerkId: customerId,
     }).populate({ path: "products.product", model: Product });
 
     return NextResponse.json(orders, { status: 200 });

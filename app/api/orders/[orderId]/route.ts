@@ -4,11 +4,14 @@ import Product from "@/lib/models/Product";
 import { connectToDB } from "@/lib/mongoDB";
 import { NextRequest, NextResponse } from "next/server";
 
-export const GET = async (req: NextRequest, { params }: { params: { orderId: String }}) => {
+export const GET = async (req: NextRequest, { params }: { params: Promise<{ orderId: string }>}) => {
   try {
     await connectToDB()
 
-    const orderDetails = await Order.findById(params.orderId).populate({
+    // Next.js 15+ passes route params as a Promise.
+    const { orderId } = await params
+
+    const orderDetails = await Order.findById(orderId).populate({
       path: "products.product",
       model: Product
     })

@@ -1,8 +1,10 @@
 import { DataTable } from "@/components/custom ui/DataTable"
 import { columns } from "@/components/orderItems/OrderItemsColums"
 
-const OrderDetails = async ({ params }: { params: { orderId: string }}) => {
-  const res = await fetch(`${process.env.ADMIN_DASHBOARD_URL}/api/orders/${params.orderId}`)
+const OrderDetails = async ({ params }: { params: Promise<{ orderId: string }>}) => {
+  // Next.js 15+ passes page params as a Promise.
+  const { orderId } = await params
+  const res = await fetch(`${process.env.ADMIN_DASHBOARD_URL}/api/orders/${orderId}`)
   const { orderDetails, customer } = await res.json()
 
   const { street, city, state, postalCode, country } = orderDetails.shippingAddress

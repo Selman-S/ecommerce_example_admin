@@ -1,7 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 images: {
-  domains: ['res.cloudinary.com'],
+  // Allow Cloudinary assets through next/image.
+  remotePatterns: [
+    {
+      protocol: 'https',
+      hostname: 'res.cloudinary.com',
+    },
+  ],
 },
 };
 
